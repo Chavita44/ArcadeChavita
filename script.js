@@ -17,7 +17,7 @@ $$("[data-l]").forEach(i=>i.src=LOGO);
    client: tu ID de editor de AdSense, ej. "ca-pub-1234567890123456"
    slots: el ID numérico de cada bloque de anuncios que crees en AdSense (Anuncios > Por bloque de anuncios).
    Mientras client o el slot estén vacíos, se ve un espacio de muestra. */
-const ADS={client:"",slots:{top:"",mid:"",panel:""}};
+const ADS={client:"ca-pub-8924562486081992",slots:{top:"",mid:"",panel:""}};
 const adHTML=k=>ADS.client&&ADS.slots[k]?`<ins class="adsbygoogle" style="display:block;width:100%" data-ad-client="${ADS.client}" data-ad-slot="${ADS.slots[k]}" data-ad-format="auto" data-full-width-responsive="true"></ins>`:`<small>Publicidad · espacio ${k}</small>`;
 function loadAds(){if(!ADS.client)return;$$("ins.adsbygoogle:not([data-p])").forEach(i=>{if(i.offsetWidth>0&&(!i.closest("#pn")||$("#pn").classList.contains("open"))){i.dataset.p=1;try{(window.adsbygoogle=window.adsbygoogle||[]).push({})}catch(e){}}})}
 function render(){const x=GAMES.filter(g=>f=="all"||g.type==f);list=GAMES.length&&x.length?x:SOON;cur=Math.min(cur,list.length-1);
