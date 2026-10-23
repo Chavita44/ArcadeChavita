@@ -3,7 +3,10 @@ const LOGO="logo.png";
 {id:"neon-run",name:"Neon Run",genre:"Acción",type:"web",size:"18 MB",cover:"",url:"juegos/neon-run/",
  desc:"Descripción del juego.",guide:["Paso 1","Paso 2"],controls:{pc:"WASD + Espacio",pad:"Stick + A",touch:"Toca y desliza"}}
  type: "web" (se juega en el navegador) o "dl" (se descarga). */
-const GAMES=[];
+const GAMES=[{id:"galaxia",name:"Chavita Galaxia",genre:"Arcade espacial",type:"web",size:"0.3 MB",cover:"juegos/galaxia/img/cover.png",url:"juegos/galaxia/",
+desc:"Defiende la galaxia en oleadas infinitas. Derrota enemigos para ganar experiencia, elige mejoras temporales, recoge monedas y compra naves nuevas en la tienda. Cada 25 oleadas aparece un jefe muy difícil.",
+guide:["Mueve tu nave con las flechas, WASD, el stick del mando o arrastrando el dedo. Disparas automáticamente.","Los enemigos sueltan experiencia, monedas y potenciadores: rayo láser, disparo disperso, doble disparo y +1 vida.","Cada vez que subes de nivel eliges 1 de 3 mejoras que duran toda la partida.","Cada 25 oleadas llega un jefe: esquiva sus ataques y no dejes de disparar.","Gasta tus monedas en la tienda para comprar naves con más vida y poder."],
+controls:{pc:"Flechas o WASD. P para pausa",pad:"Stick o cruceta. Start para pausa",touch:"Arrastra el dedo para mover"}}];
 /* Ranking por juego: {"neon-run":{p:[{n:"ANA",v:12500}],d:[{n:"LUIS",v:900}],t:[{n:"ANA",v:5400}]}}  p=puntos, d=dinero, t=segundos */
 const RANK={};
 const SOON=[1,2,3].map(i=>({id:"s"+i,name:"Próximamente",genre:"—",type:"",size:"— MB",soon:1,
