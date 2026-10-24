@@ -1,6 +1,6 @@
 const LOGO="logo.png";
 /* Agrega tus juegos aquí. Ejemplo:
-{id:"neon-run",name:"Neon Run",genre:"Acción",type:"web",size:"18 MB",cover:"",url:"juegos/neon-run/",
+{id:"neon-run",name:"Neon Run",genre:"Acción",type:"web",size:"0.8 MB",cover:"",url:"juegos/neon-run/",
  desc:"Descripción del juego.",guide:["Paso 1","Paso 2"],controls:{pc:"WASD + Espacio",pad:"Stick + A",touch:"Toca y desliza"}}
  type: "web" (se juega en el navegador) o "dl" (se descarga). */
 const GAMES=[{id:"galaxia",name:"Chavita Galaxia",genre:"Arcade espacial",type:"web",size:"0.3 MB",cover:"juegos/galaxia/img/cover.png",url:"juegos/galaxia/",
@@ -8,7 +8,7 @@ desc:"Defiende la galaxia en oleadas infinitas. Derrota enemigos para ganar expe
 guide:["Mueve tu nave con las flechas, WASD, el stick del mando o arrastrando el dedo. Disparas automáticamente.","Los enemigos sueltan experiencia, monedas y potenciadores: rayo láser, disparo disperso, doble disparo y +1 vida.","Cada vez que subes de nivel eliges 1 de 3 mejoras que duran toda la partida.","Cada 25 oleadas llega un jefe: esquiva sus ataques y no dejes de disparar.","Gasta tus monedas en la tienda para comprar naves con más vida y poder."],
 controls:{pc:"Flechas o WASD. P para pausa",pad:"Stick o cruceta. Start para pausa",touch:"Arrastra el dedo para mover"}}];
 /* Ranking por juego: {"neon-run":{p:[{n:"ANA",v:12500}],d:[{n:"LUIS",v:900}],t:[{n:"ANA",v:5400}]}}  p=puntos, d=dinero, t=segundos */
-const RANK={};
+let RANK={};try{RANK=JSON.parse(localStorage.getItem("chavita_rank"))||{}}catch(e){}
 const SOON=[1,2,3].map(i=>({id:"s"+i,name:"Próximamente",genre:"—",type:"",size:"— MB",soon:1,
 desc:"Aquí irá la descripción del juego: de qué trata y qué lo hace especial.",
 guide:["Cómo empezar la partida.","Controles básicos.","Cómo conseguir más puntos."],
@@ -55,7 +55,7 @@ const FM={p:v=>v.toLocaleString("es-MX"),d:v=>"$"+v.toLocaleString("es-MX"),t:v=
 $("#rg").innerHTML=(GAMES.length?GAMES:SOON).map(g=>`<option value="${g.id}">${g.soon?"Juego "+g.id.slice(1):g.name}</option>`).join("");
 function rank(){const r=[...((RANK[$("#rg").value]||{})[m]||[])].sort((a,b)=>b.v-a.v);
 $("#rl").innerHTML=Array.from({length:10},(_,i)=>{const x=r[i];return`<li class="${x?"":"e"}"><b>${i+1}</b><span>${x?x.n:"Sin registro"}</span><span>${x?FM[m](x.v):"—"}</span></li>`}).join("");
-$("#rn").textContent=GAMES.length?"":"Cuando haya juegos, cada uno tendrá su propio top 10."}
+$("#rn").textContent=GAMES.length?"Los récords se guardan en este dispositivo.":"Cuando haya juegos, cada uno tendrá su propio top 10."}
 $("#rg").onchange=rank;$("#rt").onclick=e=>{const b=e.target.closest("button");if(!b)return;m=b.dataset.m;$$("#rt button").forEach(x=>x.classList.toggle("on",x==b));rank()};
 /* Info */
 const I={pc:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
