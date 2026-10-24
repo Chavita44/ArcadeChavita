@@ -46,7 +46,7 @@ const m=B.m?2:1,n=e.boss?10:(Math.random()<.6?1:0);for(let i=0;i<n;i++)r.co.push
 const d=e.boss?3:(Math.random()<.08?1:0);for(let i=0;i<d;i++)r.dr.push({x:e.x+R(-20,20),y:e.y,k:Math.random()<.2?3:Math.floor(R(0,3))})}
 function hurt(){const r=run;if(r.inv>0)return;if(r.up.shield>0){r.up.shield--;r.inv=1;sfx(200,.1);return}r.lives--;r.inv=1.6;r.eb=[];sfx(120,.25,"sawtooth",.06);if(r.lives<=0)end()}
 function rec(){let Z;try{Z=JSON.parse(localStorage.getItem("chavita_rank"))||{}}catch(e){Z={}}const q=Z.galaxia=Z.galaxia||{p:[],d:[],t:[]},n=S.nick||"JUGADOR",r=run;[["p",r.pts],["d",r.coins],["t",Math.floor(r.t)]].forEach(([k,v])=>{if(v>0){q[k].push({n,v});q[k].sort((a,b)=>b.v-a.v);q[k]=q[k].slice(0,10)}});try{localStorage.setItem("chavita_rank",JSON.stringify(Z))}catch(e){}
-if(RK.url&&r.pts>0){fetch(RK.url+"/rest/v1/scores",{method:"POST",headers:{apikey:RK.key,Authorization:"Bearer "+RK.key,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({game:"galaxia",nick:n,p:r.pts,d:r.coins,t:Math.floor(r.t)})}).catch(()=>{});for(const k in WR)delete WR[k]}}
+if(RK.url&&r.pts>0){fetch(RK.url+"/rest/v1/scores",{method:"POST",headers:{...RKH,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({game:"galaxia",nick:n,p:r.pts,d:r.coins,t:Math.floor(r.t)})}).catch(()=>{});for(const k in WR)delete WR[k]}}
 function end(){const r=run;rec();S.coins+=r.coins;S.best.p=Math.max(S.best.p,r.pts);S.best.m=Math.max(S.best.m,r.coins);S.best.t=Math.max(S.best.t,Math.floor(r.t));save();B={m:0,l:0,x:0};go("over")}
 const apply=u=>{if(u[1]=="life")run.lives=Math.min(9,run.lives+1);else run.up[u[1]]+=u[2]},pick=u=>{apply(u);go("play")};
 function pad(){return[...(navigator.getGamepads?navigator.getGamepads():[])].find(Boolean)}
@@ -103,7 +103,7 @@ function drawLvl(){drawPlay();g.fillStyle="#000b";g.fillRect(0,0,W,H);T("¡NIVEL
 if(canAd())btn(30,360,300,46,"Ver anuncio: las 3 mejoras",()=>reward("lv3",()=>{ch.forEach(apply);go("play")}))}
 let rm="p";const fv=(k,v)=>k=="t"?Math.floor(v/60)+":"+String(v%60).padStart(2,"0"):k=="d"?"$"+v:String(v);
 let rs=RK.url?"w":"l";const WR={};
-function wload(k){const c=WR[k];if(c&&Date.now()-c.t<30000)return;WR[k]={t:Date.now(),rows:c?c.rows:null};fetch(RK.url+"/rest/v1/scores?game=eq.galaxia&select=nick,"+k+"&order="+k+".desc&limit=10",{headers:{apikey:RK.key,Authorization:"Bearer "+RK.key}}).then(r=>r.json()).then(d=>{WR[k]={t:Date.now(),rows:Array.isArray(d)?d.map(x=>({n:x.nick,v:x[k]})):[]}}).catch(()=>{WR[k]={t:Date.now(),rows:[]}})}
+function wload(k){const c=WR[k];if(c&&Date.now()-c.t<30000)return;WR[k]={t:Date.now(),rows:c?c.rows:null};fetch(RK.url+"/rest/v1/scores?game=eq.galaxia&select=nick,"+k+"&order="+k+".desc&limit=10",{headers:RKH}).then(r=>r.json()).then(d=>{WR[k]={t:Date.now(),rows:Array.isArray(d)?d.map(x=>({n:x.nick,v:x[k]})):[]}}).catch(()=>{WR[k]={t:Date.now(),rows:[]}})}
 function drawRank(){bgd();T("RANKING",W/2,44,4);let rows;
 if(rs=="w"){wload(rm);rows=(WR[rm]||{}).rows}else{let L={};try{L=(JSON.parse(localStorage.getItem("chavita_rank"))||{}).galaxia||{}}catch(e){}rows=L[rm]||[]}
 [["p","PUNTOS"],["d","DINERO"],["t","TIEMPO"]].forEach(([k,l],i)=>{btn(10+i*116,62,112,28,l,()=>rm=k);if(rm==k){g.fillStyle="#DAD7CD";g.fillRect(10+i*116,92,112,3)}});
