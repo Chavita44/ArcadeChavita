@@ -53,9 +53,11 @@ addEventListener("gamepadconnected",()=>{toast("Mando conectado");poll()});
 /* Ranking */
 const FM={p:v=>v.toLocaleString("es-MX"),d:v=>"$"+v.toLocaleString("es-MX"),t:v=>{const h=v/3600|0,n=(v%3600)/60|0;return(h?h+" h ":"")+n+" min "+v%60+" s"}};
 $("#rg").innerHTML=(GAMES.length?GAMES:SOON).map(g=>`<option value="${g.id}">${g.soon?"Juego "+g.id.slice(1):g.name}</option>`).join("");
-function rank(){const r=[...((RANK[$("#rg").value]||{})[m]||[])].sort((a,b)=>b.v-a.v);
-$("#rl").innerHTML=Array.from({length:10},(_,i)=>{const x=r[i];return`<li class="${x?"":"e"}"><b>${i+1}</b><span>${x?x.n:"Sin registro"}</span><span>${x?FM[m](x.v):"—"}</span></li>`}).join("");
-$("#rn").textContent=GAMES.length?"Los récords se guardan en este dispositivo.":"Cuando haya juegos, cada uno tendrá su propio top 10."}
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));let rq=0;
+function showRank(r,w){$("#rl").innerHTML=Array.from({length:10},(_,i)=>{const x=r&&r[i];return`<li class="${x?"":"e"}"><b>${i+1}</b><span>${x?esc(x.n):r?"Sin registro":"Cargando…"}</span><span>${x?FM[m](Number(x.v)||0):"—"}</span></li>`}).join("");
+$("#rn").textContent=GAMES.length?(w?"Ranking mundial: los apodos y las marcas son públicos.":"Los récords se guardan en este dispositivo."):"Cuando haya juegos, cada uno tendrá su propio top 10."}
+function rank(){const id=$("#rg").value;if(RK.url&&GAMES.length){const q=++rq;showRank(null,1);fetch(RK.url+"/rest/v1/scores?game=eq."+encodeURIComponent(id)+"&select=nick,"+m+"&order="+m+".desc&limit=10",{headers:{apikey:RK.key,Authorization:"Bearer "+RK.key}}).then(r=>r.json()).then(d=>{if(q==rq)showRank(Array.isArray(d)?d.map(x=>({n:x.nick,v:x[m]})):[],1)}).catch(()=>{if(q==rq)showRank([],1)});return}
+showRank([...((RANK[id]||{})[m]||[])].sort((a,b)=>b.v-a.v),0)}
 $("#rg").onchange=rank;$("#rt").onclick=e=>{const b=e.target.closest("button");if(!b)return;m=b.dataset.m;$$("#rt button").forEach(x=>x.classList.toggle("on",x==b));rank()};
 /* Info */
 const I={pc:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',

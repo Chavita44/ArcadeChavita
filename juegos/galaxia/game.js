@@ -13,8 +13,8 @@ const save=()=>{try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}};
 const R=(a,b)=>a+Math.random()*(b-a),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 const BAD=["puta","puto","mierda","verga","pene","culo","cabron","pendejo","chinga","zorra","nazi","sexo","porno","vagina","idiota","estupido"];
 const clean=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[0431@$5]/g,c=>({0:"o",4:"a",3:"e",1:"i","@":"a","$":"s",5:"s"}[c])).replace(/[^a-z]/g,"");
-const okNick=s=>s.length>=3&&!BAD.some(b=>clean(s).includes(b));
-function askNick(){let n=prompt("Elige tu apodo (3 a 12 letras o números). No uses tu nombre real ni datos personales:",S.nick||"");if(n==null)return;n=n.trim().slice(0,12);if(!okNick(n)){alert("Ese apodo no es válido. Prueba con otro.");return}S.nick=n;save()}
+const okNick=s=>/^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ_-]{3,12}$/.test(s)&&!BAD.some(b=>clean(s).includes(b));
+function askNick(){let n=prompt("Tu apodo se verá en el ranking mundial. Usa de 3 a 12 letras o números, sin espacios, y no pongas tu nombre real ni datos personales:",S.nick||"");if(n==null)return;n=n.trim().slice(0,12);if(!okNick(n)){alert("Ese apodo no es válido. Usa de 3 a 12 letras o números, sin espacios ni groserías.");return}S.nick=n;save()}
 let AC,mute=false;
 function sfx(f,d=.08,ty="square",v=.04){if(mute)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),a=AC.createGain(),t=AC.currentTime;o.type=ty;o.frequency.value=f;a.gain.setValueAtTime(v,t);a.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(a);a.connect(AC.destination);o.start();o.stop(t+d)}catch(e){}}
 /* Anuncios con recompensa (Ad Placement API de H5 Games Ads) */
@@ -45,7 +45,8 @@ function kill(e){const r=run;r.E.splice(r.E.indexOf(e),1);r.pts+=Math.round(e.xp
 const m=B.m?2:1,n=e.boss?10:(Math.random()<.6?1:0);for(let i=0;i<n;i++)r.co.push({x:e.x+R(-12,12),y:e.y,v:(1+Math.floor(e.tier/3))*m*(e.boss?5:1)});
 const d=e.boss?3:(Math.random()<.08?1:0);for(let i=0;i<d;i++)r.dr.push({x:e.x+R(-20,20),y:e.y,k:Math.random()<.2?3:Math.floor(R(0,3))})}
 function hurt(){const r=run;if(r.inv>0)return;if(r.up.shield>0){r.up.shield--;r.inv=1;sfx(200,.1);return}r.lives--;r.inv=1.6;r.eb=[];sfx(120,.25,"sawtooth",.06);if(r.lives<=0)end()}
-function rec(){let Z;try{Z=JSON.parse(localStorage.getItem("chavita_rank"))||{}}catch(e){Z={}}const q=Z.galaxia=Z.galaxia||{p:[],d:[],t:[]},n=S.nick||"JUGADOR",r=run;[["p",r.pts],["d",r.coins],["t",Math.floor(r.t)]].forEach(([k,v])=>{if(v>0){q[k].push({n,v});q[k].sort((a,b)=>b.v-a.v);q[k]=q[k].slice(0,10)}});try{localStorage.setItem("chavita_rank",JSON.stringify(Z))}catch(e){}}
+function rec(){let Z;try{Z=JSON.parse(localStorage.getItem("chavita_rank"))||{}}catch(e){Z={}}const q=Z.galaxia=Z.galaxia||{p:[],d:[],t:[]},n=S.nick||"JUGADOR",r=run;[["p",r.pts],["d",r.coins],["t",Math.floor(r.t)]].forEach(([k,v])=>{if(v>0){q[k].push({n,v});q[k].sort((a,b)=>b.v-a.v);q[k]=q[k].slice(0,10)}});try{localStorage.setItem("chavita_rank",JSON.stringify(Z))}catch(e){}
+if(RK.url&&r.pts>0){fetch(RK.url+"/rest/v1/scores",{method:"POST",headers:{apikey:RK.key,Authorization:"Bearer "+RK.key,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({game:"galaxia",nick:n,p:r.pts,d:r.coins,t:Math.floor(r.t)})}).catch(()=>{});for(const k in WR)delete WR[k]}}
 function end(){const r=run;rec();S.coins+=r.coins;S.best.p=Math.max(S.best.p,r.pts);S.best.m=Math.max(S.best.m,r.coins);S.best.t=Math.max(S.best.t,Math.floor(r.t));save();B={m:0,l:0,x:0};go("over")}
 const apply=u=>{if(u[1]=="life")run.lives=Math.min(9,run.lives+1);else run.up[u[1]]+=u[2]},pick=u=>{apply(u);go("play")};
 function pad(){return[...(navigator.getGamepads?navigator.getGamepads():[])].find(Boolean)}
@@ -72,7 +73,7 @@ const gl=c=>FNT.g[c]||FNT.g[" "],tw=(s,k)=>[...s].reduce((a,c)=>a+(gl(c)[1]+FNT.
 function T(s,x,y,k=2,c="#DAD7CD",al="center"){s=String(s).toUpperCase();let X=al=="center"?x-tw(s,k)/2:al=="right"?x-tw(s,k):x;const a=fa(c),Y=y-FNT.base*k;for(const ch of s){const q=gl(ch);g.drawImage(a,q[0],0,q[1],FNT.h,Math.round(X),Math.round(Y),q[1]*k,FNT.h*k);X+=(q[1]+FNT.sp)*k}}
 function btn(x,y,w,h,txt,fn,dis){btns.push({x,y,w,h,fn});const s=btns.length-1==sel,im=IM[dis?"btn_d":s?"btn_s":"btn"],ih=im.naturalHeight,iw=im.naturalWidth,cp=Math.round(8*h/ih);
 g.drawImage(im,0,0,8,ih,x,y,cp,h);g.drawImage(im,8,0,iw-16,ih,x+cp,y,w-2*cp,h);g.drawImage(im,iw-8,0,8,ih,x+w-cp,y,cp,h);
-let k=h<34?2:3;txt=String(txt);while(k>1&&tw(txt.toUpperCase(),k)>w-2*cp-6)k--;T(txt,x+w/2,y+h/2+FNT.c*k/2,k,dis?"#aaa":"#fff")}
+let k=h<34?2:3;txt=String(txt);while(k>1&&tw(txt.toUpperCase(),k)>w-2*cp-6)k--;T(txt,x+w/2,y+h/2+FNT.c*k/2,k,dis?"#aaa":"#000")}
 const bar=(f,e,x,y,w,v)=>{if(!f.naturalWidth)return;const h=w*f.naturalHeight/f.naturalWidth;g.drawImage(e,x,y,w,h);if(v>0)g.drawImage(f,0,0,Math.max(1,Math.round(f.naturalWidth*v)),f.naturalHeight,x,y,w*v,h)};
 function drawPlay(){const r=run;bgd();for(const c of r.co)spr(IM.coin,c.x,c.y,14);for(const c of r.dr)spr(c.k==3?IM.kit:IM["i"+PI[c.k]],c.x,c.y,22);
 for(const e of r.E){spr(e.s,e.x,e.y,e.boss?110:30);if(e.hp<e.mh&&!e.boss){g.fillStyle="#f44";g.fillRect(e.x-10,e.y-e.h/2-4,20*e.hp/e.mh,2)}}
@@ -101,10 +102,14 @@ btn(60,320,240,36,"OTRA VEZ",start);btn(60,362,240,36,"RANKING",()=>go("rank"));
 function drawLvl(){drawPlay();g.fillStyle="#000b";g.fillRect(0,0,W,H);T("¡NIVEL "+run.lv+"!",W/2,120,4,"#6bd16b");T("ELIGE UNA MEJORA",W/2,150,2);ch.forEach((u,i)=>btn(30,180+i*56,300,46,u[0],()=>pick(u)));
 if(canAd())btn(30,360,300,46,"Ver anuncio: las 3 mejoras",()=>reward("lv3",()=>{ch.forEach(apply);go("play")}))}
 let rm="p";const fv=(k,v)=>k=="t"?Math.floor(v/60)+":"+String(v%60).padStart(2,"0"):k=="d"?"$"+v:String(v);
-function drawRank(){bgd();T("RANKING",W/2,44,4);let L={};try{L=(JSON.parse(localStorage.getItem("chavita_rank"))||{}).galaxia||{}}catch(e){}const rows=L[rm]||[];
+let rs=RK.url?"w":"l";const WR={};
+function wload(k){const c=WR[k];if(c&&Date.now()-c.t<30000)return;WR[k]={t:Date.now(),rows:c?c.rows:null};fetch(RK.url+"/rest/v1/scores?game=eq.galaxia&select=nick,"+k+"&order="+k+".desc&limit=10",{headers:{apikey:RK.key,Authorization:"Bearer "+RK.key}}).then(r=>r.json()).then(d=>{WR[k]={t:Date.now(),rows:Array.isArray(d)?d.map(x=>({n:x.nick,v:x[k]})):[]}}).catch(()=>{WR[k]={t:Date.now(),rows:[]}})}
+function drawRank(){bgd();T("RANKING",W/2,44,4);let rows;
+if(rs=="w"){wload(rm);rows=(WR[rm]||{}).rows}else{let L={};try{L=(JSON.parse(localStorage.getItem("chavita_rank"))||{}).galaxia||{}}catch(e){}rows=L[rm]||[]}
 [["p","PUNTOS"],["d","DINERO"],["t","TIEMPO"]].forEach(([k,l],i)=>{btn(10+i*116,62,112,28,l,()=>rm=k);if(rm==k){g.fillStyle="#DAD7CD";g.fillRect(10+i*116,92,112,3)}});
-for(let i=0;i<10;i++){const y=130+i*40,x=rows[i];g.fillStyle=i<3?"#3A5A40cc":"#141f18cc";g.fillRect(10,y-22,W-20,32);T(i+1,34,y,2,"#DAD7CD","right");T(x?x.n:"SIN REGISTRO",44,y,2,x?"#DAD7CD":"#667","left");if(x)T(fv(rm,x.v),W-18,y,2,"#f5c542","right")}
-T("RECORDS GUARDADOS EN ESTE DISPOSITIVO",W/2,H-60,1,"#9fa89c");btn(60,H-46,240,34,"VOLVER",()=>go("menu"))}
+if(RK.url){btn(10,100,172,26,"MUNDIAL",()=>rs="w");btn(188,100,162,26,"MI DISPOSITIVO",()=>rs="l");g.fillStyle="#DAD7CD";g.fillRect(rs=="w"?10:188,128,rs=="w"?172:162,3)}
+for(let i=0;i<10;i++){const y=172+i*36,x=rows&&rows[i];g.fillStyle=i<3?"#3A5A40cc":"#141f18cc";g.fillRect(10,y-20,W-20,30);T(i+1,34,y,2,"#DAD7CD","right");T(x?x.n:rows?"SIN REGISTRO":"CARGANDO...",44,y,2,x?"#DAD7CD":"#667","left");if(x)T(fv(rm,Number(x.v)||0),W-18,y,2,"#f5c542","right")}
+T(rs=="w"?"RANKING MUNDIAL":"RECORDS DE ESTE DISPOSITIVO",W/2,H-60,1,"#9fa89c");btn(60,H-46,240,34,"VOLVER",()=>go("menu"))}
 /* ---------- entrada y bucle ---------- */
 const K={};let pp={};
 const nav=c=>{if((sc=="play"&&!paused)||!btns.length)return;if(c=="ArrowUp")sel=Math.max(0,sel-1);if(c=="ArrowDown")sel=Math.min(btns.length-1,sel+1);if(c=="Enter"||c=="Space"){const b=btns[sel];b&&b.fn()}};
